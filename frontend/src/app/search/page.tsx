@@ -22,6 +22,7 @@ export default function SearchPage() {
     gapLength?: string
     gapWidth?: string
     gapHeight?: string
+    error?: string
   }>({})
 
   const [theme, setTheme] = useState<'light' | 'dark'>('light')
@@ -35,16 +36,23 @@ export default function SearchPage() {
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setResult({
-      category: form.category,
-      itemCode: form.itemCode,
-      expectedQuantity: 10,
-      gapLength: form.gapLength,
-      gapWidth: form.gapWidth,
-      gapHeight: form.gapHeight,
-    })
-  }
+    e.preventDefault();
+    try {
+      const res = await fetch("http://localhost:5000/api/search", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(form),
+      });
+      if (!res.ok) throw new Error("サーバーエラー");
+      const data = await res.json();
+      setResult(data);
+    } catch (error) {
+      setResult({ error: "バックエンドとの通信に失敗しました" });
+    }
+  };
+
 
   return (
     <div className={styles.container}>
