@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import styles from './search.module.css'
 
 export default function SearchPage() {
@@ -14,6 +14,7 @@ export default function SearchPage() {
     gapWidth: '',
     gapHeight: '',
   })
+
   const [result, setResult] = useState<{
     category?: string
     itemCode?: string
@@ -22,6 +23,12 @@ export default function SearchPage() {
     gapWidth?: string
     gapHeight?: string
   }>({})
+
+  const [theme, setTheme] = useState<'light' | 'dark'>('light')
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme)
+  }, [theme])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value })
@@ -41,6 +48,18 @@ export default function SearchPage() {
 
   return (
     <div className={styles.container}>
+      <button
+        onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
+        className={styles.button}
+        style={{
+          position: 'absolute',
+          top: '1rem',
+          right: '1rem',
+          zIndex: 10,
+        }}
+      >
+        {theme === 'light' ? 'ダークモード' : 'ライトモード'}
+      </button>
       <h1 className={styles.title}>外箱けんさくん</h1>
       <div className={styles.layout}>
         <div className={styles.inputArea}>
@@ -76,8 +95,8 @@ export default function SearchPage() {
                   name="sizeLength"
                   value={form.sizeLength}
                   onChange={handleChange}
-                  className={styles.input}
-                  required
+                className={styles.input}
+                required
                 />
               </div>
               <div className={styles.formGroup}>
