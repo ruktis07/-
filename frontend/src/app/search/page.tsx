@@ -4,7 +4,9 @@ import { useState, useEffect } from 'react'
 import styles from './search.module.css'
 
 export default function SearchPage() {
+  // 初期値は既存
   const [form, setForm] = useState({
+    mode: 'existing',
     category: '',
     itemCode: '',
     sizeLength: '',
@@ -24,160 +26,196 @@ export default function SearchPage() {
     gapHeight?: string
   }>({})
 
-  const [theme, setTheme] = useState<'light' | 'dark'>('light')
+  // OSテーマ初期値取得
+  const getInitialTheme = () => {
+    if (typeof window !== 'undefined' && window.matchMedia) {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+    }
+    return 'light'
+  }
 
+  const [theme, setTheme] = useState<'light' | 'dark'>(getInitialTheme)
+
+  // OSテーマ変更検知
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+    const handleChange = (e: MediaQueryListEvent) => {
+      setTheme(e.matches ? 'dark' : 'light')
+    }
+    mediaQuery.addEventListener('change', handleChange as EventListener)
+    return () => mediaQuery.removeEventListener('change', handleChange as EventListener)
   }, [theme])
 
+  // 入力変更
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value })
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // 送信
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+    // 隙間が空欄の場合は「30」を自動設定
+    const gapLength = form.gapLength === '' ? '30' : form.gapLength
+    const gapWidth = form.gapWidth === '' ? '30' : form.gapWidth
+    const gapHeight = form.gapHeight === '' ? '30' : form.gapHeight
     setResult({
       category: form.category,
       itemCode: form.itemCode,
       expectedQuantity: 10,
-      gapLength: form.gapLength,
-      gapWidth: form.gapWidth,
-      gapHeight: form.gapHeight,
+      gapLength,
+      gapWidth,
+      gapHeight,
     })
   }
 
   return (
     <div className={styles.container}>
-      <button
-        onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
-        className={styles.button}
-        style={{
-          position: 'absolute',
-          top: '1rem',
-          right: '1rem',
-          zIndex: 10,
-        }}
-      >
-        {theme === 'light' ? 'ダークモード' : 'ライトモード'}
-      </button>
       <h1 className={styles.title}>外箱けんさくん</h1>
       <div className={styles.layout}>
         <div className={styles.inputArea}>
           <form onSubmit={handleSubmit} className={styles.form}>
             <div className={styles.formGroup}>
-              <label className={styles.label}>区分</label>
-              <input
-                type="text"
-                name="category"
-                value={form.category}
-                onChange={handleChange}
-                className={styles.input}
-                required
-              />
+              <label>
+                <input
+                  type="radio"
+                  name="mode"
+                  value="existing"
+                  checked={form.mode === 'existing'}
+                  onChange={handleChange}
+                /> 既存のやつで探す
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  name="mode"
+                  value="new"
+                  checked={form.mode === 'new'}
+                  onChange={handleChange}
+                /> 新しく作るやつで探す
+              </label>
             </div>
-            <div className={styles.formGroup}>
-              <label className={styles.label}>品目コード</label>
-              <input
-                type="text"
-                name="itemCode"
-                value={form.itemCode}
-                onChange={handleChange}
-                className={styles.input}
-                required
-              />
-            </div>
-            <h3 className={styles.subtitle}>寸法</h3>
+
+            {/* 既存モード：区分・品目コードのみ */}
+            {form.mode === 'existing' && (
+              <>
+                <div className={styles.formGroup}>
+                  <label className={styles.label}>区分</label>
+                  <input
+                    type="text"
+                    name="category"
+                    value={form.category}
+                    onChange={handleChange}
+                    className={styles.input}
+                    required
+                  />
+                </div>
+                <div className={styles.formGroup}>
+                  <label className={styles.label}>品目コード</label>
+                  <input
+                    type="text"
+                    name="itemCode"
+                    value={form.itemCode}
+                    onChange={handleChange}
+                    className={styles.input}
+                    required
+                  />
+                </div>
+              </>
+            )}
+
+            {/* 新規モード：寸法のみ */}
+            {form.mode === 'new' && (
+              <>
+                <h3 className={styles.subtitle}>箱の大きさは？</h3>
+                <div className={styles.dimensionGroup}>
+                  <div className={styles.formGroup}>
+                    <label className={styles.label}>長辺（一番長いとこ）<small>（mm）</small></label>
+                    <input
+                      type="number"
+                      name="sizeLength"
+                      value={form.sizeLength}
+                      onChange={handleChange}
+                      className={styles.input}
+                      required
+                    />
+                  </div>
+                  <div className={styles.formGroup}>
+                    <label className={styles.label}>短辺（短いとこ）<small>（mm）</small></label>
+                    <input
+                      type="number"
+                      name="sizeWidth"
+                      value={form.sizeWidth}
+                      onChange={handleChange}
+                      className={styles.input}
+                      required
+                    />
+                  </div>
+                  <div className={styles.formGroup}>
+                    <label className={styles.label}>高さ（上から見た高さ）<small>（mm）</small></label>
+                    <input
+                      type="number"
+                      name="sizeHeight"
+                      value={form.sizeHeight}
+                      onChange={handleChange}
+                      className={styles.input}
+                      required
+                    />
+                  </div>
+                </div>
+              </>
+            )}
+
+            {/* 隙間：どちらのモードでも表示 */}
+            <h3 className={styles.subtitle}>隙間はどれくらい？</h3>
             <div className={styles.dimensionGroup}>
               <div className={styles.formGroup}>
-                <label className={styles.label}>長辺</label>
-                <input
-                  type="number"
-                  name="sizeLength"
-                  value={form.sizeLength}
-                  onChange={handleChange}
-                className={styles.input}
-                required
-                />
-              </div>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>短辺</label>
-                <input
-                  type="number"
-                  name="sizeWidth"
-                  value={form.sizeWidth}
-                  onChange={handleChange}
-                  className={styles.input}
-                  required
-                />
-              </div>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>高さ</label>
-                <input
-                  type="number"
-                  name="sizeHeight"
-                  value={form.sizeHeight}
-                  onChange={handleChange}
-                  className={styles.input}
-                  required
-                />
-              </div>
-            </div>
-            <h3 className={styles.subtitle}>隙間</h3>
-            <div className={styles.dimensionGroup}>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>長辺</label>
+                <label className={styles.label}>長辺の隙間<small>（mm、空欄で30）</small></label>
                 <input
                   type="number"
                   name="gapLength"
                   value={form.gapLength}
                   onChange={handleChange}
                   className={styles.input}
-                  required
                 />
               </div>
               <div className={styles.formGroup}>
-                <label className={styles.label}>短辺</label>
+                <label className={styles.label}>短辺の隙間<small>（mm、空欄で30）</small></label>
                 <input
                   type="number"
                   name="gapWidth"
                   value={form.gapWidth}
                   onChange={handleChange}
                   className={styles.input}
-                  required
                 />
               </div>
               <div className={styles.formGroup}>
-                <label className={styles.label}>高さ</label>
+                <label className={styles.label}>高さの隙間<small>（mm、空欄で30）</small></label>
                 <input
                   type="number"
                   name="gapHeight"
                   value={form.gapHeight}
                   onChange={handleChange}
                   className={styles.input}
-                  required
                 />
               </div>
             </div>
+            <button type="submit" className={styles.button}>
+              探してみる！
+            </button>
           </form>
-          <button
-            type="button"
-            className={styles.button}
-            onClick={handleSubmit}
-          >
-            検索
-          </button>
         </div>
         <div className={styles.resultArea}>
-          <h2 className={styles.resultTitle}>検索結果</h2>
+          <h2 className={styles.resultTitle}>見つかった！</h2>
           <div className={styles.resultBox}>
             {result.category && <p className={styles.resultItem}>区分: {result.category}</p>}
             {result.itemCode && <p className={styles.resultItem}>品目コード: {result.itemCode}</p>}
-            {result.expectedQuantity && <p className={styles.resultItem}>想定入数: {result.expectedQuantity}</p>}
-            {result.gapLength && <p className={styles.resultItem}>隙間（長辺）: {result.gapLength}</p>}
-            {result.gapWidth && <p className={styles.resultItem}>隙間（短辺）: {result.gapWidth}</p>}
-            {result.gapHeight && <p className={styles.resultItem}>隙間（高さ）: {result.gapHeight}</p>}
+            {result.expectedQuantity && <p className={styles.resultItem}>入るかな？: {result.expectedQuantity}個</p>}
+            {result.gapLength && <p className={styles.resultItem}>隙間（長辺）: {result.gapLength}mm</p>}
+            {result.gapWidth && <p className={styles.resultItem}>隙間（短辺）: {result.gapWidth}mm</p>}
+            {result.gapHeight && <p className={styles.resultItem}>隙間（高さ）: {result.gapHeight}mm</p>}
             {!result.category && !result.itemCode && (
-              <p className={styles.noResult}>検索結果がありません</p>
+              <p className={styles.noResult}>見つからなかった…</p>
             )}
           </div>
         </div>

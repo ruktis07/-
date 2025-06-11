@@ -1,23 +1,28 @@
-:root {
-  --bg-color: #f9f9f9;
-  --text-color: #2c3e50;
-  --input-bg: #fff;
-  --input-border: #ccc;
-  --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  --button-bg: #3498db;
-  --button-hover: #2980b9;
-  --secondary-bg: #fff;
-  --secondary-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+/* グローバルCSSでテーマごとの色を定義 */
+[data-theme="light"] {
+  --background: #ffffff;
+  --text: #333333;
+  --input-background: #f8f8f8;
+  --input-text: #333333;
+  --input-border: #cccccc;
+  --button-background: #e0e0e0;
+  --button-text: #333333;
+  --button-border: #cccccc;
+  --result-background: #f0f0f0;
+  --result-text: #333333;
+  --result-border: #cccccc;
 }
 
 [data-theme="dark"] {
-  --bg-color: #1a1a1a;
-  --text-color: #f0f0f0;
-  --input-bg: #2d2d2d;
-  --input-border: #555;
-  --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-  --button-bg: #1e88e5;
-  --button-hover: #1565c0;
-  --secondary-bg: #2d2d2d;
-  --secondary-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  --background: #222222;
+  --text: #f0f0f0;
+  --input-background: #333333;
+  --input-text: #f0f0f0;
+  --input-border: #555555;
+  --button-background: #444444;
+  --button-text: #f0f0f0;
+  --button-border: #555555;
+  --result-background: #333333;
+  --result-text: #f0f0f0;
+  --result-border: #555555;
 }

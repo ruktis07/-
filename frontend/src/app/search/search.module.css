@@ -1,99 +1,125 @@
+/* フランクな外箱探検隊！スタイル */
 .container {
-  max-width: 2000px;
-  margin: 2rem auto;
+  background-color: var(--background);
+  color: var(--text);
+  min-height: 100vh;
   padding: 2rem;
-  background: var(--bg-color);
-  border-radius: 8px;
-  box-shadow: var(--box-shadow);
-}
-
-.title {
-  color: var(--text-color);
-  margin-bottom: 1.5rem;
+  font-family: 'M PLUS Rounded 1c', sans-serif;
 }
 
 .layout {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
   gap: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  flex-wrap: wrap;
 }
 
 .inputArea, .resultArea {
-  background: var(--secondary-bg);
-  padding: 1.5rem;
-  border-radius: 8px;
-  box-shadow: var(--secondary-shadow);
+  flex: 1;
+  min-width: 300px; /* スマホでも崩れにくく */
 }
 
-.form {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.formGroup {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.label {
+.title {
+  text-align: center;
+  margin-bottom: 2rem;
+  font-size: 2rem;
   font-weight: bold;
-  color: var(--text-color);
-}
-
-.input {
-  padding: 0.75rem;
-  border: 1px solid var(--input-border);
-  border-radius: 4px;
-  font-size: 1rem;
-  background: var(--input-bg);
-  color: var(--text-color);
+  color: #ff7e5f;
+  letter-spacing: 0.05em;
 }
 
 .subtitle {
-  color: var(--text-color);
-  margin-top: 1rem;
-  margin-bottom: 0.5rem;
+  margin: 1.5rem 0 0.75rem;
+  font-size: 1.25rem;
+  color: #ff9e7d;
 }
 
-.dimensionGroup {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 1rem;
+.form {
+  margin-bottom: 1.5rem;
+}
+
+.formGroup {
+  margin-bottom: 1.25rem;
+}
+
+.label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+  color: #ff7e5f;
+}
+
+.input {
+  background-color: var(--input-background);
+  color: var(--input-text);
+  border: 2px solid var(--input-border);
+  border-radius: 12px;
+  padding: 0.75rem;
+  width: 100%;
+  box-sizing: border-box;
+  font-size: 1rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.input:focus {
+  border-color: #ff7e5f;
+  box-shadow: 0 0 0 2px rgba(255, 126, 95, 0.2);
+  outline: none;
 }
 
 .button {
-  margin-top: 1.5rem;
-  padding: 0.75rem 1.5rem;
-  background: var(--button-bg);
+  background-color: #ff7e5f;
   color: white;
   border: none;
-  border-radius: 4px;
-  font-size: 1rem;
+  border-radius: 12px;
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
   cursor: pointer;
-  transition: background 0.2s;
+  width: 100%;
+  margin-top: 1.5rem;
+  font-weight: bold;
+  transition: background-color 0.2s, transform 0.1s;
 }
 
 .button:hover {
-  background: var(--button-hover);
+  background-color: #ff5f3a;
+  transform: translateY(-2px);
+}
+
+.button:active {
+  transform: translateY(0);
+}
+
+.resultArea {
+  background-color: var(--result-background);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .resultTitle {
-  color: var(--text-color);
-  margin-bottom: 1rem;
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+  color: #ff7e5f;
 }
 
 .resultBox {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  background-color: var(--result-background);
+  border: 2px solid var(--result-border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .resultItem {
-  margin-bottom: 0.5rem;
+  margin: 0.75rem 0;
+  font-size: 1.1rem;
 }
 
 .noResult {
-  color: #7f8c8d;
+  color: var(--text);
+  font-style: italic;
+  opacity: 0.8;
 }
