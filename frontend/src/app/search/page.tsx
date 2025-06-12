@@ -86,15 +86,7 @@ export default function SearchPage() {
       {/* Now Loadingオーバーレイ（検索中のみ表示） */}
       {isSubmitting && (
         <div className={styles.loadingOverlay}>
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            src="/video/nowloading_緑.mp4"
-          >
-            お使いのブラウザは動画に対応していません。
-          </video>
+          <div className={styles.loadingSpinner} />
         </div>
       )}
 
@@ -254,9 +246,9 @@ export default function SearchPage() {
                           {item.itemCode && <p>品目コード: {item.itemCode}</p>}
                           {item.itemName && <p>品目名: {item.itemName}</p>}
                           {item.expectedQuantity && <p>入るかな？: {item.expectedQuantity}個</p>}
-                          {item.gapLength && <p>隙間（長辺）: {item.gapLength}mm</p>}
-                          {item.gapWidth && <p>隙間（短辺）: {item.gapWidth}mm</p>}
-                          {item.gapHeight && <p>隙間（高さ）: {item.gapHeight}mm</p>}
+                          {item.gapLength !== undefined && <p>隙間（長辺）: {item.gapLength}mm</p>}
+                          {item.gapWidth !== undefined && <p>隙間（短辺）: {item.gapWidth}mm</p>}
+                          {item.gapHeight !== undefined && <p>隙間（高さ）: {item.gapHeight}mm</p>}
                         </>
                       )}
                     </div>
