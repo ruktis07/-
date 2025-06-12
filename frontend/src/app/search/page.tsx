@@ -1,13 +1,22 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 import styles from './search.module.css'
 
+interface ResultItem {
+  itemCode?: string
+  itemName?: string
+  expectedQuantity?: number
+  gapLength?: string
+  gapWidth?: string
+  gapHeight?: string
+  error?: string
+}
+
 export default function SearchPage() {
-  // 初期値は既存
   const [form, setForm] = useState({
     mode: 'existing',
-    category: '',
     itemCode: '',
     sizeLength: '',
     sizeWidth: '',
@@ -17,15 +26,8 @@ export default function SearchPage() {
     gapHeight: '',
   })
 
-  const [result, setResult] = useState<{
-    category?: string
-    itemCode?: string
-    expectedQuantity?: number
-    gapLength?: string
-    gapWidth?: string
-    gapHeight?: string
-    error?: string
-  }>({})
+  const [result, setResult] = useState<ResultItem[]>([])
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   // OSテーマ初期値取得
   const getInitialTheme = () => {
@@ -55,7 +57,8 @@ export default function SearchPage() {
 
   // 送信
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
+    setIsSubmitting(true)
     try {
       const res = await fetch("http://localhost:5000/api/search", {
         method: "POST",
@@ -63,19 +66,49 @@ export default function SearchPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(form),
-      });
-      if (!res.ok) throw new Error("サーバーエラー");
-      const data = await res.json();
-      setResult(data);
+      })
+      if (!res.ok) throw new Error("サーバーエラー")
+      const data = await res.json()
+      // バックエンドから配列で返ってくる想定
+      setResult(Array.isArray(data) ? data : [data])
     } catch (error) {
-      setResult({ error: "バックエンドとの通信に失敗しました" });
+      setResult([{ error: "バックエンドとの通信に失敗しました" }])
+    } finally {
+      setIsSubmitting(false)
     }
-  };
+  }
 
+  // 結果エリア表示条件
+  const shouldShowResult = result.length > 0 || (result.length === 1 && result[0].error)
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.title}>外箱けんさくん</h1>
+      {/* Now Loadingオーバーレイ（検索中のみ表示） */}
+      {isSubmitting && (
+        <div className={styles.loadingOverlay}>
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            src="/video/nowloading_緑.mp4"
+          >
+            お使いのブラウザは動画に対応していません。
+          </video>
+        </div>
+      )}
+
+      {/* タイトル＋画像 */}
+      <h1 className={styles.title}>
+        外箱けんさくん
+        <Image
+          src="/kensaku_man.png"
+          alt="外箱けんさくんアイコン"
+          width={40}
+          height={40}
+        />
+      </h1>
+
       <div className={styles.layout}>
         <div className={styles.inputArea}>
           <form onSubmit={handleSubmit} className={styles.form}>
@@ -100,32 +133,19 @@ export default function SearchPage() {
               </label>
             </div>
 
-            {/* 既存モード：区分・品目コードのみ */}
+            {/* 既存モード：品目コードのみ */}
             {form.mode === 'existing' && (
-              <>
-                <div className={styles.formGroup}>
-                  <label className={styles.label}>区分</label>
-                  <input
-                    type="text"
-                    name="category"
-                    value={form.category}
-                    onChange={handleChange}
-                    className={styles.input}
-                    required
-                  />
-                </div>
-                <div className={styles.formGroup}>
-                  <label className={styles.label}>品目コード</label>
-                  <input
-                    type="text"
-                    name="itemCode"
-                    value={form.itemCode}
-                    onChange={handleChange}
-                    className={styles.input}
-                    required
-                  />
-                </div>
-              </>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>品目コード</label>
+                <input
+                  type="text"
+                  name="itemCode"
+                  value={form.itemCode}
+                  onChange={handleChange}
+                  className={styles.input}
+                  required
+                />
+              </div>
             )}
 
             {/* 新規モード：寸法のみ */}
@@ -204,24 +224,51 @@ export default function SearchPage() {
                 />
               </div>
             </div>
-            <button type="submit" className={styles.button}>
-              探してみる！
+            <button
+              type="submit"
+              className={styles.button}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? '検索中...' : '探してみる！'}
             </button>
           </form>
         </div>
+
+        {/* 結果エリア（常に同じサイズで表示） */}
         <div className={styles.resultArea}>
-          <h2 className={styles.resultTitle}>見つかった！</h2>
-          <div className={styles.resultBox}>
-            {result.category && <p className={styles.resultItem}>区分: {result.category}</p>}
-            {result.itemCode && <p className={styles.resultItem}>品目コード: {result.itemCode}</p>}
-            {result.expectedQuantity && <p className={styles.resultItem}>入るかな？: {result.expectedQuantity}個</p>}
-            {result.gapLength && <p className={styles.resultItem}>隙間（長辺）: {result.gapLength}mm</p>}
-            {result.gapWidth && <p className={styles.resultItem}>隙間（短辺）: {result.gapWidth}mm</p>}
-            {result.gapHeight && <p className={styles.resultItem}>隙間（高さ）: {result.gapHeight}mm</p>}
-            {!result.category && !result.itemCode && (
-              <p className={styles.noResult}>見つからなかった…</p>
-            )}
-          </div>
+          {shouldShowResult ? (
+            <>
+              <h2 className={styles.resultTitle}>
+                {result.length === 0 ? "見つからなかった…" : "見つかった！"}
+              </h2>
+              <div className={styles.resultBox}>
+                {result.length === 0 ? (
+                  <p className={styles.noResult}>見つからなかった…</p>
+                ) : (
+                  result.map((item, index) => (
+                    <div key={index} className={styles.resultItem}>
+                      {item.error ? (
+                        <p className={styles.error}>{item.error}</p>
+                      ) : (
+                        <>
+                          {item.itemCode && <p>品目コード: {item.itemCode}</p>}
+                          {item.itemName && <p>品目名: {item.itemName}</p>}
+                          {item.expectedQuantity && <p>入るかな？: {item.expectedQuantity}個</p>}
+                          {item.gapLength && <p>隙間（長辺）: {item.gapLength}mm</p>}
+                          {item.gapWidth && <p>隙間（短辺）: {item.gapWidth}mm</p>}
+                          {item.gapHeight && <p>隙間（高さ）: {item.gapHeight}mm</p>}
+                        </>
+                      )}
+                    </div>
+                  ))
+                )}
+              </div>
+            </>
+          ) : (
+            <div className={styles.resultBox}>
+              <p className={styles.noResult}>検索結果がありません</p>
+            </div>
+          )}
         </div>
       </div>
     </div>

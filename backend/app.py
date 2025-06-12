@@ -1,5 +1,6 @@
-from flask import Flask, request
+from flask import Flask, request, request
 from flask_cors import CORS
+from db_config import get_oracle_connection
 from db_config import get_oracle_connection
 
 app = Flask(__name__)
@@ -11,6 +12,7 @@ def main():
     data=request.get_json()
     if data['mode']=='existing':
         item_cd=data['itemCode']    #品目コード
+        
         where_query=f"WHERE m040m.ITEM_DIV = 'A' AND m040m.ITEM_CD = '{item_cd}'"
         result=db_search(where_query)
         main_box={"x":result[0][2],"y":result[0][3],"z":result[0][4]}
