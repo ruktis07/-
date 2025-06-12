@@ -24,6 +24,7 @@ export default function SearchPage() {
     gapLength?: string
     gapWidth?: string
     gapHeight?: string
+    error?: string
   }>({})
 
   // OSテーマ初期値取得
@@ -53,21 +54,24 @@ export default function SearchPage() {
   }
 
   // 送信
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    // 隙間が空欄の場合は「30」を自動設定
-    const gapLength = form.gapLength === '' ? '30' : form.gapLength
-    const gapWidth = form.gapWidth === '' ? '30' : form.gapWidth
-    const gapHeight = form.gapHeight === '' ? '30' : form.gapHeight
-    setResult({
-      category: form.category,
-      itemCode: form.itemCode,
-      expectedQuantity: 10,
-      gapLength,
-      gapWidth,
-      gapHeight,
-    })
-  }
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const res = await fetch("http://localhost:5000/api/serch", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(form),
+      });
+      if (!res.ok) throw new Error("サーバーエラー");
+      const data = await res.json();
+      setResult(data);
+    } catch (error) {
+      setResult({ error: "バックエンドとの通信に失敗しました" });
+    }
+  };
+
 
   return (
     <div className={styles.container}>
