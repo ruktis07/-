@@ -17,7 +17,7 @@
 
 .inputArea, .resultArea {
   flex: 1;
-  min-width: 300px; /* スマホでも崩れにくく */
+  min-width: 300px;
 }
 
 .title {
@@ -27,6 +27,16 @@
   font-weight: bold;
   color: #ff7e5f;
   letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row; /* 画像を右に配置 */
+  gap: 0.5rem; /* タイトルと画像の間のスペース */
+}
+
+.title [data-nextjs-image-wrapper] {
+  margin-right: 0.5rem;
+  height: 1em;
 }
 
 .subtitle {
@@ -69,9 +79,9 @@
 }
 
 .button {
-  background-color: #ff7e5f;
-  color: white;
-  border: none;
+  background-color: var(--button-background);
+  color: var(--button-text);
+  border: 2px solid var(--button-border);
   border-radius: 12px;
   padding: 1rem 2rem;
   font-size: 1.1rem;
@@ -116,10 +126,50 @@
 .resultItem {
   margin: 0.75rem 0;
   font-size: 1.1rem;
+  border: 2px solid var(--result-border);
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background-color: var(--result-background);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+.resultItem:last-child {
+  border-bottom: 2px solid var(--result-border);
+  margin-bottom: 0;
 }
 
 .noResult {
   color: var(--text);
   font-style: italic;
   opacity: 0.8;
+}
+
+.error {
+  color: #d32f2f;
+  font-weight: bold;
+}
+
+/* Now Loadingオーバーレイ（中央・背景ぼかし・疑似全画面） */
+.loadingOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.loadingOverlay video {
+  width: 200vw;
+  max-width: 2800%;
+  height: auto;
+  max-height: 200vh;
+  object-fit: contain;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }

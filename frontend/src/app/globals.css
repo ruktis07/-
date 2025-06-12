@@ -1,27 +1,26 @@
 /* グローバルCSSでテーマごとの色を定義 */
-[data-theme="light"] {
+:root {
   --background: #ffffff;
   --text: #333333;
   --input-background: #f8f8f8;
   --input-text: #333333;
   --input-border: #cccccc;
-  --button-background: #e0e0e0;
-  --button-text: #333333;
-  --button-border: #cccccc;
+  --button-background: #ff7e5f;
+  --button-text: #ffffff;
+  --button-border: #ff7e5f;
   --result-background: #f0f0f0;
   --result-text: #333333;
   --result-border: #cccccc;
 }
-
 [data-theme="dark"] {
   --background: #222222;
   --text: #f0f0f0;
   --input-background: #333333;
   --input-text: #f0f0f0;
   --input-border: #555555;
-  --button-background: #444444;
+  --button-background: #ff5f3a;
   --button-text: #f0f0f0;
-  --button-border: #555555;
+  --button-border: #ff5f3a;
   --result-background: #333333;
   --result-text: #f0f0f0;
   --result-border: #555555;
