@@ -1,5 +1,6 @@
-from flask import Flask, request
+from flask import Flask, request, request
 from flask_cors import CORS
+from db_config import get_oracle_connection
 from db_config import get_oracle_connection
 
 app = Flask(__name__)
@@ -25,13 +26,15 @@ def search():
         """
         cursor.execute(query)
         result=cursor.fetchall()
+        data['itemName']=result[0][1]
         data['gapLength']=result[0][2]
         data['gapWidth']=result[0][3]
         data['gapHeight']=result[0][4]
         print(result)
     elif data['mode']=='new':
         data['gapHeight']=70
-    return [data,data]
+    return [data,data,data]
+
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000, debug=True)
