@@ -50,9 +50,14 @@ def item_search(box,list,result):
         lx=item[2]
         ly=item[3]
         lz=item[4]
+        gapx=lx%sx
+        gapy=ly%sy
+        gapz=lz%sz
         quantity=int(lx/sx)*int(ly/sy)*int(lz/sz)
-        if quantity!=0:
-            data={'category': item[0], 'itemCode': item[1],'gapLength': lx%sx, 'gapWidth': ly%sy, 'gapHeight': lz%sz ,'expectedQuantity': quantity}
+        if quantity!=0 and gapx<=30 and gapy<=30 and gapz<=30:
+            print(sx,sy,sz,lx,ly,lz)
+            data={'itemCode': item[0], 'itemName': item[1],'expectedQuantity': quantity,'gapLength': gapx, 'gapWidth': gapy, 'gapHeight': gapz }
+            print(data)
             result.append(data)
     print(result)
 
