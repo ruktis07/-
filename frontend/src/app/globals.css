@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c&display=swap');
+
 /* グローバルCSSでテーマごとの色を定義 */
 :root {
   --background: #ffffff;
@@ -24,4 +26,24 @@
   --result-background: #333333;
   --result-text: #f0f0f0;
   --result-border: #555555;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--background);
+  color: var(--text);
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+* {
+  box-sizing: border-box;
 }
