@@ -8,7 +8,7 @@ interface ResultItem {
   item100Code?: string // 誤記のため削除
   itemCode?: string
   itemName?: string
-  expectedQuantity?: number
+  expectedQuantity?: string
   gapLength?: number | string
   gapWidth?: number | string
   gapHeight?: number | string
@@ -26,9 +26,9 @@ export default function SearchPage() {
     sizeLength: '',
     sizeWidth: '',
     sizeHeight: '',
-    gapLength: '',
-    gapWidth: '',
-    gapHeight: '',
+    gapLength: 30,
+    gapWidth: 30,
+    gapHeight: 30,
   })
 
   const [result, setResult] = useState<ResultItem[]>([])
@@ -265,7 +265,7 @@ export default function SearchPage() {
                         {item.expectedQuantity !== undefined && (
                           <tr>
                             <th>入る個数</th>
-                            <td>{formatValue(item.expectedQuantity)}個</td>
+                            <td>{formatValue(item.expectedQuantity)}</td>
                           </tr>
                         )}
                         {item.gapLength !== undefined && (

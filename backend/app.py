@@ -12,7 +12,7 @@ def main():
     data=request.get_json()
     if data['mode']=='existing':
         item_cd=data['itemCode']    #品目コード
-        
+        gap={"x":int(data["gapLength"]),"y":int(data["gapWidth"]),"z":int(data["gapHeight"])}
         where_query=f"WHERE m040m.ITEM_DIV = 'A' AND m040m.ITEM_CD = '{item_cd}'"
         result=db_search(where_query)
         x=result[0][2]
@@ -25,7 +25,8 @@ def main():
     where_query="WHERE m040m.ITEM_NAME1 LIKE '%外箱%' AND (m040m.SIZE1 !=0 AND m040m.SIZE2 !=0 AND m040m.SIZE3 !=0)"
     list=db_search(where_query)
     result=[]
-    item_search(x,y,z,list,result,orientation='縦入れ')
+    item_search(x,y,z,list,result,gap,orientation='縦入れ')
+    item_search(y,x,z,list,result,gap,orientation='横入れ')
     return result
 
 #データベースから品目情報取得
@@ -46,7 +47,7 @@ FROM DFW_M040M m040m
     result=cursor.fetchall()
     return result
 
-def item_search(sx,sy,sz,list,result,orientation):
+def item_search(sx,sy,sz,list,result,gap,orientation):
     for item in list:
         lx=item[2]
         ly=item[3]
@@ -55,7 +56,8 @@ def item_search(sx,sy,sz,list,result,orientation):
         gapy=int(ly%sy)
         gapz=int(lz%sz)
         quantity=int(lx/sx)*int(ly/sy)*int(lz/sz)
-        if quantity!=0 and gapx<=30 and gapy<=30 and gapz<=30:
+        if quantity!=0 and gapx<=gap["x"] and gapy<=gap["y"] and gapz<=gap["z"]:
+            quantity=f"{int(lx/sx)} 箱 × {int(ly/sy)} 箱 × {int(lz/sz)} 段"
             data={
                 'itemCode': item[0],
                 'itemName': item[1],
@@ -66,7 +68,7 @@ def item_search(sx,sy,sz,list,result,orientation):
                 'orientation': orientation,
                 'outerLength': lx,
                 'outerWidth': ly,
-                'outerHeigh': lz
+                'outerHeight': lz
             }
             result.append(data)
 
