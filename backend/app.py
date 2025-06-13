@@ -73,7 +73,7 @@ def item_search(sx,sy,sz,list,result,gap,orientation):
             }
             result.append(data)
 
-
+#隙間の合計の小さい順にソート
 def sort_by_gap_sum(data):
     """
     gapLength + gapWidth + gapHeight の合計が小さい順に並び替える関数
