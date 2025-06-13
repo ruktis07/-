@@ -1,3 +1,4 @@
+/* フランクな外箱探検隊！スタイル */
 .container {
   background-color: var(--background);
   color: var(--text);
@@ -8,14 +9,13 @@
 
 .layout {
   display: flex;
-  flex-wrap: wrap;
-  gap: 3rem;
+  gap: 2rem;
   max-width: 1200px;
   margin: 0 auto;
+  flex-wrap: wrap;
 }
 
-.inputArea,
-.resultArea {
+.inputArea, .resultArea {
   flex: 1;
   min-width: 300px;
 }
@@ -26,10 +26,17 @@
   font-size: 2rem;
   font-weight: bold;
   color: #ff7e5f;
+  letter-spacing: 0.05em;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-direction: row;
   gap: 0.5rem;
+}
+
+.title [data-nextjs-image-wrapper] {
+  margin-right: 0.5rem;
+  height: 1em;
 }
 
 .subtitle {
@@ -60,20 +67,17 @@
   border-radius: 12px;
   padding: 0.75rem;
   width: 100%;
-  font-size: 1rem;
   box-sizing: border-box;
+  font-size: 1rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-/* ボタンとスピナーの横並び用の親コンテナ */
-.buttonArea {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 1rem;
-  flex-wrap: nowrap;
+.input:focus {
+  border-color: #ff7e5f;
+  box-shadow: 0 0 0 2px rgba(255, 126, 95, 0.2);
+  outline: none;
 }
 
-/* ボタンを画面サイズに応じて可変・中央寄せ */
 .button {
   background-color: var(--button-background);
   color: var(--button-text);
@@ -81,14 +85,11 @@
   border-radius: 12px;
   padding: 1rem 2rem;
   font-size: 1.1rem;
-  font-weight: bold;
   cursor: pointer;
-  white-space: nowrap;
-
-  width: 100%;
-  max-width: 550px;
-  min-width: 200px;
-  box-sizing: border-box;
+  width: auto;
+  margin-top: 1.5rem;
+  font-weight: bold;
+  transition: background-color 0.2s, transform 0.1s;
 }
 
 .button:hover {
@@ -96,20 +97,8 @@
   transform: translateY(-2px);
 }
 
-/* スピナーをボタンと横並びに自然に表示 */
-.inlineSpinner {
-  width: 30px;
-  height: 30px;
-  border: 4px solid #ff7e5f;
-  border-top: 4px solid transparent;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  flex-shrink: 0;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+.button:active {
+  transform: translateY(0);
 }
 
 .resultArea {
@@ -120,29 +109,37 @@
 }
 
 .resultTitle {
-  margin: 0 0 1.5rem;
+  margin-top: 0;
+  margin-bottom: 1.5rem;
   font-size: 1.5rem;
   color: #ff7e5f;
 }
 
 .resultBox {
-  max-height: 800%;
-  overflow-y: auto;
+  background-color: var(--result-background);
   border: 2px solid var(--result-border);
   border-radius: 12px;
   padding: 1.5rem;
-  background-color: var(--result-background);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .resultItem {
+  margin: 0.75rem 0;
+  font-size: 1.1rem;
   border: 2px solid var(--result-border);
   border-radius: 12px;
   padding: 1rem;
   margin-bottom: 1rem;
   background-color: var(--result-background);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+.resultItem:last-child {
+  border-bottom: 2px solid var(--result-border);
+  margin-bottom: 0;
 }
 
 .noResult {
+  color: var(--text);
   font-style: italic;
   opacity: 0.8;
 }
@@ -152,61 +149,20 @@
   font-weight: bold;
 }
 
-.dimensionGroup {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+/* インラインスピナー：ボタン右隣に小さく表示 */
+.inlineSpinner {
+  display: inline-block;
+  margin-left: 1rem;
+  width: 24px;
+  height: 24px;
+  border: 3px solid #ff7e5f;
+  border-top: 3px solid transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  vertical-align: middle;
 }
 
-.dimensionRow {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
-}
-
-.dimensionTimes {
-  font-weight: bold;
-  font-size: 1.2rem;
-}
-
-.dimensionUnit {
-  margin-left: 0.5rem;
-  font-size: 1rem;
-}
-
-.resultRow {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  margin-bottom: 0.75rem;
-  padding: 1rem;
-  border-radius: 8px;
-  overflow-x: auto;
-}
-
-.resultField {
-  white-space: nowrap;
-  font-weight: 500;
-}
-.resultRow {
-  margin-bottom: 1.5rem;
-}
-
-.resultTable {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.resultTable th {
-  text-align: left;
-  padding: 6px 12px;
-  background-color: #f0f0f0;
-  white-space: nowrap;
-}
-
-.resultTable td {
-  padding: 6px 12px;
-  background-color: #ffffff;
-  white-space: nowrap;
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
