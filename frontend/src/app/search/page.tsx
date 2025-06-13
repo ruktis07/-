@@ -8,13 +8,13 @@ interface ResultItem {
   itemCode?: string
   itemName?: string
   expectedQuantity?: number
-  gapLength?: string
-  gapWidth?: string
-  gapHeight?: string
-  orientation?: '縦入れ' | '横入れ'
-  outerLength?: number
-  outerWidth?: number
-  outerHeight?: number
+  gap100Length?: number | string // 誤記のため削除
+  gapLength?: number | string
+  gapWidth?: number | string
+  gapHeight?: number | string
+  outerLength?: number | string
+  outerWidth?: number | string
+  outerHeight?: number | string
   error?: string
 }
 
@@ -33,6 +33,7 @@ export default function SearchPage() {
   const [result, setResult] = useState<ResultItem[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
 
+  // OSテーマ初期値取得
   const getInitialTheme = () => {
     if (typeof window !== 'undefined' && window.matchMedia) {
       return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
@@ -42,6 +43,7 @@ export default function SearchPage() {
 
   const [theme, setTheme] = useState<'light' | 'dark'>(getInitialTheme)
 
+  // OSテーマ変更検知
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
@@ -52,36 +54,47 @@ export default function SearchPage() {
     return () => mediaQuery.removeEventListener('change', handleChange as EventListener)
   }, [theme])
 
+  // 入力変更
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value })
   }
 
+  // 送信
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
     try {
       const res = await fetch("http://localhost:5000/api/search", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(form),
       })
       if (!res.ok) throw new Error("サーバーエラー")
       const data = await res.json()
       setResult(Array.isArray(data) ? data : [data])
-    } catch {
+    } catch (error) {
       setResult([{ error: "バックエンドとの通信に失敗しました" }])
     } finally {
       setIsSubmitting(false)
     }
   }
 
-  const shouldShowResult = result.length > 0 || (result.length === 1 && result[0].error)
+  // 値が空やundefinedの場合に「-」を表示するヘルパー関数
+  const formatValue = (value: any) => value !== undefined && value !== '' ? value : '-'
 
   return (
     <div className={styles.container}>
+      {/* タイトル＋画像 */}
       <h1 className={styles.title}>
         外箱けんさくん
-        <Image src="/kensaku_man.png" alt="外箱けんさくんアイコン" width={40} height={40} />
+        <Image
+          src="/kensaku_man.png"
+          alt="外箱けんさくんアイコン"
+          width={40}
+          height={40}
+        />
       </h1>
 
       <div className={styles.layout}>
@@ -108,6 +121,7 @@ export default function SearchPage() {
               </label>
             </div>
 
+            {/* 既存モード：品目コードのみ */}
             {form.mode === 'existing' && (
               <div className={styles.formGroup}>
                 <label className={styles.label}>品目コード</label>
@@ -122,142 +136,129 @@ export default function SearchPage() {
               </div>
             )}
 
+            {/* 新規モード：寸法のみ */}
             {form.mode === 'new' && (
               <>
                 <h3 className={styles.subtitle}>箱の大きさは？</h3>
-                <div className={styles.dimensionRow}>
-                  <input
-                    type="number"
-                    name="sizeLength"
-                    value={form.sizeLength}
-                    onChange={handleChange}
-                    className={styles.input}
-                    required
-                    placeholder="長辺"
-                  />
-                  <span className={styles.dimensionTimes}>×</span>
-                  <input
-                    type="number"
-                    name="sizeWidth"
-                    value={form.sizeWidth}
-                    onChange={handleChange}
-                    className={styles.input}
-                    required
-                    placeholder="短辺"
-                  />
-                  <span className={styles.dimensionTimes}>×</span>
-                  <input
-                    type="number"
-                    name="sizeHeight"
-                    value={form.sizeHeight}
-                    onChange={handleChange}
-                    className={styles.input}
-                    required
-                    placeholder="高さ"
-                  />
-                  <span className={styles.dimensionUnit}>mm</span>
+                <div className={styles.dimensionGroup}>
+                  <div className={styles.formGroup}>
+                    <label className={styles.label}>長辺（一番長いとこ）<small>（mm）</small></label>
+                    <input
+                      type="number"
+                      name="sizeLength"
+                      value={form.sizeLength}
+                      onChange={handleChange}
+                      className={styles.input}
+                      required
+                    />
+                  </div>
+                  <div className={styles.formGroup}>
+                    <label className={styles.label}>短辺（短いとこ）<small>（mm）</small></label>
+                    <input
+                      type="number"
+                      name="sizeWidth"
+                      value={form.sizeWidth}
+                      onChange={handleChange}
+                      className={styles.input}
+                      required
+                    />
+                  </div>
+                  <div className={styles.formGroup}>
+                    <label className={styles.label}>高さ（上から見た高さ）<small>（mm）</small></label>
+                    <input
+                      type="number"
+                      name="sizeHeight"
+                      value={form.sizeHeight}
+                      onChange={handleChange}
+                      className={styles.input}
+                      required
+                    />
+                  </div>
                 </div>
               </>
             )}
 
+            {/* 隙間：どちらのモードでも表示 */}
             <h3 className={styles.subtitle}>隙間はどれくらい？</h3>
             <div className={styles.dimensionGroup}>
               <div className={styles.formGroup}>
                 <label className={styles.label}>長辺の隙間<small>（mm、空欄で30）</small></label>
-                <input type="number" name="gapLength" value={form.gapLength} onChange={handleChange} className={styles.input} />
+                <input
+                  type="number"
+                  name="gapLength"
+                  value={form.gapLength}
+                  onChange={handleChange}
+                  className={styles.input}
+                />
               </div>
               <div className={styles.formGroup}>
                 <label className={styles.label}>短辺の隙間<small>（mm、空欄で30）</small></label>
-                <input type="number" name="gapWidth" value={form.gapWidth} onChange={handleChange} className={styles.input} />
+                <input
+                  type="number"
+                  name="gapWidth"
+                  value={form.gapWidth}
+                  onChange={handleChange}
+                  className={styles.input}
+                />
               </div>
               <div className={styles.formGroup}>
                 <label className={styles.label}>高さの隙間<small>（mm、空欄で30）</small></label>
-                <input type="number" name="gapHeight" value={form.gapHeight} onChange={handleChange} className={styles.input} />
+                <input
+                  type="number"
+                  name="gapHeight"
+                  value={form.gapHeight}
+                  onChange={handleChange}
+                  className={styles.input}
+                />
               </div>
             </div>
-
-            <div className={styles.buttonRow}>
-              <button type="submit" className={styles.button} disabled={isSubmitting}>
-                探してみる！
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <button
+                type="submit"
+                className={styles.button}
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? '検索中...' : '探してみる！'}
               </button>
               {isSubmitting && <div className={styles.inlineSpinner} />}
             </div>
           </form>
         </div>
-
+        {/* 結果エリア（常に表示） */}
         <div className={styles.resultArea}>
-          {shouldShowResult ? (
-            <>
-              <h2 className={styles.resultTitle}>見つかった！</h2>
-              <div className={styles.resultBox}>
-                {result.map((item, index) => (
-  <div key={index} className={styles.resultRow}>
-    {item.error ? (
-      <span className={styles.error}>{item.error}</span>
-    ) : (
-      <table className={styles.resultTable}>
-        <tbody>
-          {item.itemCode && (
-            <tr>
-              <th>品目コード</th>
-              <td>{item.itemCode}</td>
-            </tr>
-          )}
-          {item.itemName && (
-            <tr>
-              <th>品目名</th>
-              <td>{item.itemName}</td>
-            </tr>
-          )}
-          {item.expectedQuantity !== undefined && (
-            <tr>
-              <th>梱包数</th>
-              <td>{item.expectedQuantity}個</td>
-            </tr>
-          )}
-          {item.gapLength && (
-            <tr>
-              <th>隙間（長辺）</th>
-              <td>{item.gapLength}mm</td>
-            </tr>
-          )}
-          {item.gapWidth && (
-            <tr>
-              <th>隙間（短辺）</th>
-              <td>{item.gapWidth}mm</td>
-            </tr>
-          )}
-          {item.gapHeight && (
-            <tr>
-              <th>隙間（高さ）</th>
-              <td>{item.gapHeight}mm</td>
-            </tr>
-          )}
-          {item.outerLength && item.outerWidth && item.outerHeight && (
-            <tr>
-              <th>サイズ</th>
-              <td>{item.outerLength} × {item.outerWidth} × {item.outerHeight} mm</td>
-            </tr>
-          )}
-          {item.orientation && (
-            <tr>
-              <th>向き</th>
-              <td>{item.orientation}</td>
-            </tr>
-          )}
-        </tbody>
-      </table>
-    )}
-  </div>
-))}
-
-              </div>
-            </>
-          ) : (
-            <div className={styles.resultBox}>
-              <p className={styles.noResult}>検索結果がありません</p>
-            </div>
-          )}
+          <h2 className={styles.resultTitle}>
+            {isSubmitting ? '検索中...' : result.length === 0 ? "見つからなかった…" : "見つかった！"}
+          </h2>
+          <div className={styles.resultBox}>
+            {isSubmitting ? (
+              <p className={styles.noResult}>検索中...</p>
+            ) : result.length === 0 ? (
+              <p className={styles.noResult}>見つからなかった…</p>
+            ) : (
+              result.map((item, index) => (
+                <div key={index} className={styles.resultItem}>
+                  {item.error ? (
+                    <p className={styles.error}>{item.error}</p>
+                  ) : (
+                    <>
+                      {item.itemCode !== undefined && <p>品目コード: {formatValue(item.itemCode)}</p>}
+                      {item.itemName !== undefined && <p>品目名: {formatValue(item.itemName)}</p>}
+                      {(item.outerLength !== undefined || item.outerWidth !== undefined || item.outerHeight !== undefined) && (
+                        <p><strong>外箱サイズ:</strong> {formatValue(item.outerLength)} × {formatValue(item.outerWidth)} × {formatValue(item.outerHeight)} mm</p>
+                      )}
+                      {item.expectedQuantity !== undefined && <p>入る個数: {formatValue(item.expectedQuantity)}個</p>}
+                      {item.gapLength !== undefined && <p>隙間（長辺）: {formatValue(item.gapLength)}mm</p>}
+                      {item.gapWidth !== undefined && <p>隙間（短辺）: {formatValue(item.gapWidth)}mm</p>}
+                      {item.gapHeight !== undefined && <p>隙間（高さ）: {formatValue(item.gapHeight)}mm</p>}
+                      {item.gapHeight !== undefined && item.gapLength !== undefined && item.gapWidth !== undefined && (
+                        <p>挿入方向: {Number(item.gapHeight) > Math.min(Number(item.gapLength), Number(item.gapWidth)) ? '縦入れ' : '横入れ'}</p>
+                      )}
+                    </>
+                  )}
+                </div>
+              ))
+            )}
+          </div>
         </div>
       </div>
     </div>
