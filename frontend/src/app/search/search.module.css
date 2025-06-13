@@ -121,21 +121,38 @@
   border-radius: 12px;
   padding: 1.5rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .resultItem {
-  margin: 0.75rem 0;
-  font-size: 1.1rem;
   border: 2px solid var(--result-border);
   border-radius: 12px;
   padding: 1rem;
-  margin-bottom: 1rem;
   background-color: var(--result-background);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
-.resultItem:last-child {
-  border-bottom: 2px solid var(--result-border);
-  margin-bottom: 0;
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th {
+  text-align: left;
+  padding: 0.25rem 0.5rem;
+  background-color: transparent;
+  width: 30%;
+}
+
+.table td {
+  padding: 0.25rem 0.5rem;
+  background-color: transparent;
+}
+
+.table tr:not(:last-child) {
+  border-bottom: 1px solid var(--result-border);
 }
 
 .noResult {
@@ -149,7 +166,6 @@
   font-weight: bold;
 }
 
-/* インラインスピナー：ボタン右隣に小さく表示 */
 .inlineSpinner {
   display: inline-block;
   margin-left: 1rem;

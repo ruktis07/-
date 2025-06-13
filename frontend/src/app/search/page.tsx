@@ -5,15 +5,16 @@ import Image from 'next/image'
 import styles from './search.module.css'
 
 interface ResultItem {
+  item100Code?: string // 誤記のため削除
   itemCode?: string
   itemName?: string
   expectedQuantity?: number
-  gap100Length?: number | string // 誤記のため削除
   gapLength?: number | string
   gapWidth?: number | string
   gapHeight?: number | string
   outerLength?: number | string
   outerWidth?: number | string
+  outer100Height?: number | string // 誤記のため削除
   outerHeight?: number | string
   error?: string
 }
@@ -36,6 +37,7 @@ export default function SearchPage() {
   // OSテーマ初期値取得
   const getInitialTheme = () => {
     if (typeof window !== 'undefined' && window.matchMedia) {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light' // 誤記のため削除
       return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
     }
     return 'light'
@@ -47,7 +49,7 @@ export default function SearchPage() {
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-    const handleChange = (e: MediaQueryListEvent) => {
+    const handleChange = (e: MediaQueryListEvent) => { // 誤記のため修正
       setTheme(e.matches ? 'dark' : 'light')
     }
     mediaQuery.addEventListener('change', handleChange as EventListener)
@@ -240,20 +242,58 @@ export default function SearchPage() {
                   {item.error ? (
                     <p className={styles.error}>{item.error}</p>
                   ) : (
-                    <>
-                      {item.itemCode !== undefined && <p>品目コード: {formatValue(item.itemCode)}</p>}
-                      {item.itemName !== undefined && <p>品目名: {formatValue(item.itemName)}</p>}
-                      {(item.outerLength !== undefined || item.outerWidth !== undefined || item.outerHeight !== undefined) && (
-                        <p><strong>外箱サイズ:</strong> {formatValue(item.outerLength)} × {formatValue(item.outerWidth)} × {formatValue(item.outerHeight)} mm</p>
-                      )}
-                      {item.expectedQuantity !== undefined && <p>入る個数: {formatValue(item.expectedQuantity)}個</p>}
-                      {item.gapLength !== undefined && <p>隙間（長辺）: {formatValue(item.gapLength)}mm</p>}
-                      {item.gapWidth !== undefined && <p>隙間（短辺）: {formatValue(item.gapWidth)}mm</p>}
-                      {item.gapHeight !== undefined && <p>隙間（高さ）: {formatValue(item.gapHeight)}mm</p>}
-                      {item.gapHeight !== undefined && item.gapLength !== undefined && item.gapWidth !== undefined && (
-                        <p>挿入方向: {Number(item.gapHeight) > Math.min(Number(item.gapLength), Number(item.gapWidth)) ? '縦入れ' : '横入れ'}</p>
-                      )}
-                    </>
+                    <table className={styles.table}>
+                      <tbody>
+                        {item.itemCode !== undefined && (
+                          <tr>
+                            <th>品目コード</th>
+                            <td>{formatValue(item.itemCode)}</td>
+                          </tr>
+                        )}
+                        {item.itemName !== undefined && (
+                          <tr>
+                            <th>品目名</th>
+                            <td>{formatValue(item.itemName)}</td>
+                          </tr>
+                        )}
+                        {(item.outerLength !== undefined || item.outerWidth !== undefined || item.outerHeight !== undefined) && (
+                          <tr>
+                            <th>外箱サイズ</th>
+                            <td>{formatValue(item.outerLength)} × {formatValue(item.outerWidth)} × {formatValue(item.outerHeight)} mm</td>
+                          </tr>
+                        )}
+                        {item.expectedQuantity !== undefined && (
+                          <tr>
+                            <th>入る個数</th>
+                            <td>{formatValue(item.expectedQuantity)}個</td>
+                          </tr>
+                        )}
+                        {item.gapLength !== undefined && (
+                          <tr>
+                            <th>隙間（長辺）</th>
+                            <td>{formatValue(item.gapLength)}mm</td>
+                          </tr>
+                        )}
+                        {item.gapWidth !== undefined && (
+                          <tr>
+                            <th>隙間（短辺）</th>
+                            <td>{formatValue(item.gapWidth)}mm</td>
+                          </tr>
+                        )}
+                        {item.gapHeight !== undefined && (
+                          <tr>
+                            <th>隙間（高さ）</th>
+                            <td>{formatValue(item.gapHeight)}mm</td>
+                          </tr>
+                        )}
+                        {item.gapHeight !== undefined && item.gapLength !== undefined && item.gapWidth !== undefined && (
+                          <tr>
+                            <th>挿入方向</th>
+                            <td>{Number(item.gapHeight) > Math.min(Number(item.gapLength), Number(item.gapWidth)) ? '縦入れ' : '横入れ'}</td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
                   )}
                 </div>
               ))
