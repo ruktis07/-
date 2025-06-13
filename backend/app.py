@@ -10,24 +10,25 @@ CORS(app)
 #検索ボタン処理
 def main():
     data=request.get_json()
+    gap={"x":int(data["gapLength"]),"y":int(data["gapWidth"]),"z":int(data["gapHeight"])}
     if data['mode']=='existing':
         item_cd=data['itemCode']    #品目コード
-        gap={"x":int(data["gapLength"]),"y":int(data["gapWidth"]),"z":int(data["gapHeight"])}
         where_query=f"WHERE m040m.ITEM_DIV = 'A' AND m040m.ITEM_CD = '{item_cd}'"
         result=db_search(where_query)
         x=result[0][2]
         y=result[0][3]
         z=result[0][4]
     elif data['mode']=='new':
-        x=data['sizeLength']
-        y=data['sizeWidth']
-        z=data['sizeHeigh']
+        x=int(data['sizeLength'])
+        y=int(data['sizeWidth'])
+        z=int(data['sizeHeight'])
     where_query="WHERE m040m.ITEM_NAME1 LIKE '%外箱%' AND (m040m.SIZE1 !=0 AND m040m.SIZE2 !=0 AND m040m.SIZE3 !=0)"
     list=db_search(where_query)
     result=[]
     item_search(x,y,z,list,result,gap,orientation='縦入れ')
     item_search(y,x,z,list,result,gap,orientation='横入れ')
-    return result
+    sort_result=sort_by_gap_sum(result)
+    return sort_result
 
 #データベースから品目情報取得
 def db_search(where_query):
@@ -71,6 +72,16 @@ def item_search(sx,sy,sz,list,result,gap,orientation):
                 'outerHeight': lz
             }
             result.append(data)
+
+#隙間の合計の小さい順にソート
+def sort_by_gap_sum(data):
+    """
+    gapLength + gapWidth + gapHeight の合計が小さい順に並び替える関数
+    """
+    return sorted(
+        data,
+        key=lambda x: x['gapLength'] + x['gapWidth'] + x['gapHeight']
+    )
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000, debug=True)
