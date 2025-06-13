@@ -15,13 +15,17 @@ def main():
         
         where_query=f"WHERE m040m.ITEM_DIV = 'A' AND m040m.ITEM_CD = '{item_cd}'"
         result=db_search(where_query)
-        main_box={"x":result[0][2],"y":result[0][3],"z":result[0][4]}
+        x=result[0][2]
+        y=result[0][3]
+        z=result[0][4]
     elif data['mode']=='new':
-        main_box={"x":data['sizeLength'],"y":data['sizeWidth'],"z":data['sizeHeight']}
+        x=data['sizeLength']
+        y=data['sizeWidth']
+        z=data['sizeHeigh']
     where_query="WHERE m040m.ITEM_NAME1 LIKE '%外箱%' AND (m040m.SIZE1 !=0 AND m040m.SIZE2 !=0 AND m040m.SIZE3 !=0)"
     list=db_search(where_query)
     result=[]
-    item_search(main_box,list,result)
+    item_search(x,y,z,list,result,orientation='縦入れ')
     return result
 
 #データベースから品目情報取得
@@ -42,24 +46,29 @@ FROM DFW_M040M m040m
     result=cursor.fetchall()
     return result
 
-def item_search(box,list,result):
+def item_search(sx,sy,sz,list,result,orientation):
     for item in list:
-        sx=int(box["x"])
-        sy=int(box["y"])
-        sz=int(box["z"])
         lx=item[2]
         ly=item[3]
         lz=item[4]
-        gapx=lx%sx
-        gapy=ly%sy
-        gapz=lz%sz
+        gapx=int(lx%sx)
+        gapy=int(ly%sy)
+        gapz=int(lz%sz)
         quantity=int(lx/sx)*int(ly/sy)*int(lz/sz)
         if quantity!=0 and gapx<=30 and gapy<=30 and gapz<=30:
-            print(sx,sy,sz,lx,ly,lz)
-            data={'itemCode': item[0], 'itemName': item[1],'expectedQuantity': quantity,'gapLength': gapx, 'gapWidth': gapy, 'gapHeight': gapz }
-            print(data)
+            data={
+                'itemCode': item[0],
+                'itemName': item[1],
+                'expectedQuantity': quantity,
+                'gapLength': gapx,
+                'gapWidth': gapy, 
+                'gapHeight': gapz,
+                'orientation': orientation,
+                'outerLength': lx,
+                'outerWidth': ly,
+                'outerHeigh': lz
+            }
             result.append(data)
-    print(result)
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000, debug=True)
