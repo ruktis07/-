@@ -15,9 +15,14 @@ def main():
         item_cd=data['itemCode']    #品目コード
         where_query=f"WHERE m040m.ITEM_DIV = 'A' AND m040m.ITEM_CD = '{item_cd}'"
         result=db_search(where_query)
-        x=result[0][2]
-        y=result[0][3]
-        z=result[0][4]
+        if result==[]:
+            x=0
+            y=0
+            z=0
+        else:
+            x=result[0][2]
+            y=result[0][3]
+            z=result[0][4]
     elif data['mode']=='new':
         x=int(data['sizeLength'])
         y=int(data['sizeWidth'])
@@ -26,7 +31,7 @@ def main():
     list=db_search(where_query)
     result=[]
     if x==0 and y==0 and z==0:
-        data={"error":"この品目コードは箱ではないか、電脳にサイズが登録がされていません。"}
+        data={"error":"この品目コードは箱ではないか、サイズが登録がされていません。"}
         result.append(data)
     else:
         item_search(x,y,z,list,result,gap,orientation='縦入れ')
