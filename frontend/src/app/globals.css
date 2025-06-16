@@ -11,6 +11,10 @@
   --result-background: #f0f0f0;
   --result-text: #333333;
   --result-border: #cccccc;
+  /* ログイン画面用追加変数 */
+  --primary-color: #ff7e5f;
+  --button-hover: #ff5f3a;
+  --error-color: #dc3545;
 }
 [data-theme="dark"] {
   --background: #222222;
@@ -24,4 +28,8 @@
   --result-background: #333333;
   --result-text: #f0f0f0;
   --result-border: #555555;
+  /* ログイン画面用追加変数 */
+  --primary-color: #ff5f3a;
+  --button-hover: #ff3f1a;
+  --error-color: #ff6b6b;
 }
