@@ -1,39 +1,50 @@
-// app/page.tsx
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import styles from './page.module.css'
 
-export default function Home() {
+export default function LoginPage() {
   const [id, setId] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const router = useRouter()
 
-  // テーマ管理
-  const getInitialTheme = () => {
-    if (typeof window !== 'undefined' && window.matchMedia) {
-      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-    }
-    return 'light'
-  }
-
-  const [theme, setTheme] = useState<'light' | 'dark'>(getInitialTheme)
-
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme)
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-    const handleChange = (e: MediaQueryListEvent) => {
-      setTheme(e.matches ? 'dark' : 'light')
-    }
-    mediaQuery.addEventListener('change', handleChange)
-    return () => mediaQuery.removeEventListener('change', handleChange)
-  }, [theme])
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    router.push('/search')
+    setError('')
+
+    // テスト用：IDとパスワードが両方空欄ならログイン許可
+    if (id === '' && password === '') {
+      router.push('/search')
+      return
+    }
+
+    try {
+      const res = await fetch('http://localhost:5000/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: id, password }),
+      })
+
+      // レスポンスがJSONかどうかチェック
+      const contentType = res.headers.get('content-type')
+      if (!contentType || !contentType.includes('application/json')) {
+        throw new Error('サーバーから無効なレスポンスが返されました')
+      }
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        throw new Error(data.msg || 'ログインに失敗しました')
+      }
+
+      // JWTをローカルストレージに保存（例）
+      localStorage.setItem('token', data.access_token)
+      router.push('/search')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'ログインに失敗しました')
+    }
   }
 
   return (
