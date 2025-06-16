@@ -30,8 +30,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-direction: row;
-  gap: 0.5rem;
+  flex-direction: row; /* 画像を右に配置 */
+  gap: 0.5rem; /* タイトルと画像の間のスペース */
 }
 
 .title [data-nextjs-image-wrapper] {
@@ -129,32 +129,18 @@
 }
 
 .resultItem {
+  margin: 0.75rem 0;
+  font-size: 1.1rem;
   border: 2px solid var(--result-border);
   border-radius: 12px;
   padding: 1rem;
+  margin-bottom: 1rem;
   background-color: var(--result-background);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
-
-.table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.table th {
-  text-align: left;
-  padding: 0.25rem 0.5rem;
-  background-color: transparent;
-  width: 30%;
-}
-
-.table td {
-  padding: 0.25rem 0.5rem;
-  background-color: transparent;
-}
-
-.table tr:not(:last-child) {
-  border-bottom: 1px solid var(--result-border);
+.resultItem:last-child {
+  border-bottom: 2px solid var(--result-border);
+  margin-bottom: 0;
 }
 
 .noResult {
@@ -168,19 +154,27 @@
   font-weight: bold;
 }
 
-.inlineSpinner {
-  display: inline-block;
-  margin-left: 1rem;
-  width: 24px;
-  height: 24px;
-  border: 3px solid #ff7e5f;
-  border-top: 3px solid transparent;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  vertical-align: middle;
+/* Now Loadingオーバーレイ（中央・背景ぼかし・疑似全画面） */
+.loadingOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
 }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+.loadingOverlay video {
+  width: 200vw;
+  max-width: 2800%;
+  height: auto;
+  max-height: 200vh;
+  object-fit: contain;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }

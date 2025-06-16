@@ -83,6 +83,5 @@ def sort_by_gap_sum(data):
         data,
         key=lambda x: x['gapLength'] + x['gapWidth'] + x['gapHeight']
     )
-
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000, debug=True)
