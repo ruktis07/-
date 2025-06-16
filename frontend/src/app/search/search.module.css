@@ -86,7 +86,7 @@
   padding: 1rem 2rem;
   font-size: 1.1rem;
   cursor: pointer;
-  width: 100%;
+  width: 580px;
   margin-top: 1.5rem;
   font-weight: bold;
   transition: background-color 0.2s, transform 0.1s;
@@ -116,11 +116,16 @@
 }
 
 .resultBox {
+  max-height: 600px; /* お好みで調整 */
+  overflow-y: auto;
   background-color: var(--result-background);
   border: 2px solid var(--result-border);
   border-radius: 12px;
   padding: 1.5rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .resultItem {

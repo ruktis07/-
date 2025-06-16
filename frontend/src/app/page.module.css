@@ -1,0 +1,63 @@
+/* app/page.module.css */
+.container {
+  background-color: var(--background);
+  color: var(--text);
+  min-height: 100vh;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s ease;
+}
+
+.title {
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  color: var(--primary-color);
+}
+
+.form {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.input {
+  background-color: var(--input-background);
+  color: var(--input-text);
+  border: 2px solid var(--input-border);
+  border-radius: 8px;
+  padding: 1rem;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(255, 126, 95, 0.2);
+}
+
+.button {
+  background-color: var(--button-background);
+  color: var(--button-text);
+  border: none;
+  border-radius: 8px;
+  padding: 1rem;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.button:hover {
+  background-color: var(--button-hover);
+}
+
+.error {
+  color: var(--error-color);
+  margin-bottom: 1rem;
+  text-align: center;
+}
