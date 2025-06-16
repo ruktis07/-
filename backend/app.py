@@ -25,10 +25,14 @@ def main():
     where_query="WHERE m040m.ITEM_NAME1 LIKE '%外箱%' AND (m040m.SIZE1 !=0 AND m040m.SIZE2 !=0 AND m040m.SIZE3 !=0)"
     list=db_search(where_query)
     result=[]
-    item_search(x,y,z,list,result,gap,orientation='縦入れ')
-    item_search(y,x,z,list,result,gap,orientation='横入れ')
-    sort_result=sort_by_gap_sum(result)
-    return sort_result
+    if x==0 and y==0 and z==0:
+        data={"error":"この品目コードは箱ではないか、電脳にサイズが登録がされていません。"}
+        result.append(data)
+    else:
+        item_search(x,y,z,list,result,gap,orientation='縦入れ')
+        item_search(y,x,z,list,result,gap,orientation='横入れ')
+        result=sort_by_gap_sum(result)
+    return result
 
 #データベースから品目情報取得
 def db_search(where_query):
@@ -75,9 +79,6 @@ def item_search(sx,sy,sz,list,result,gap,orientation):
 
 #隙間の合計の小さい順にソート
 def sort_by_gap_sum(data):
-    """
-    gapLength + gapWidth + gapHeight の合計が小さい順に並び替える関数
-    """
     return sorted(
         data,
         key=lambda x: x['gapLength'] + x['gapWidth'] + x['gapHeight']
