@@ -4,17 +4,15 @@ import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import styles from './search.module.css'
 
-interface ResultItem {
-  item100Code?: string // 誤記のため削除
+  interface ResultItem {
   itemCode?: string
   itemName?: string
-  expectedQuantity?: string
+  expectedQuantity?: number
   gapLength?: number | string
   gapWidth?: number | string
   gapHeight?: number | string
   outerLength?: number | string
   outerWidth?: number | string
-  outer100Height?: number | string // 誤記のため削除
   outerHeight?: number | string
   error?: string
 }
@@ -26,18 +24,17 @@ export default function SearchPage() {
     sizeLength: '',
     sizeWidth: '',
     sizeHeight: '',
-    gapLength: 30,
-    gapWidth: 30,
-    gapHeight: 30,
+    gapLength: '',
+    gapWidth: '',
+    gapHeight: '',
   })
-
   const [result, setResult] = useState<ResultItem[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [hasSearched, setHasSearched] = useState(false)
 
   // OSテーマ初期値取得
   const getInitialTheme = () => {
     if (typeof window !== 'undefined' && window.matchMedia) {
-      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light' // 誤記のため削除
       return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
     }
     return 'light'
@@ -49,7 +46,7 @@ export default function SearchPage() {
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-    const handleChange = (e: MediaQueryListEvent) => { // 誤記のため修正
+    const handleChange = (e: MediaQueryListEvent) => {
       setTheme(e.matches ? 'dark' : 'light')
     }
     mediaQuery.addEventListener('change', handleChange as EventListener)
@@ -65,13 +62,19 @@ export default function SearchPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
+    setHasSearched(true)
     try {
       const res = await fetch("http://localhost:5000/api/search", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          ...form,
+          gapLength: form.gapLength || '30',
+          gapWidth: form.gapWidth || '30',
+          gapHeight: form.gapHeight || '30',
+        }),
       })
       if (!res.ok) throw new Error("サーバーエラー")
       const data = await res.json()
@@ -222,18 +225,20 @@ export default function SearchPage() {
               >
                 {isSubmitting ? '検索中...' : '探してみる！'}
               </button>
-              {isSubmitting && <div className={styles.inlineSpinner} />}
+              {/* スピナーはなし */}
             </div>
           </form>
         </div>
         {/* 結果エリア（常に表示） */}
         <div className={styles.resultArea}>
           <h2 className={styles.resultTitle}>
-            {isSubmitting ? '検索中...' : result.length === 0 ? "見つからなかった…" : "見つかった！"}
+            {isSubmitting ? '検索中...' : !hasSearched ? "検索してみよう！" : result.length === 0 ? "見つからなかった…" : "見つかった！"}
           </h2>
           <div className={styles.resultBox}>
             {isSubmitting ? (
               <p className={styles.noResult}>検索中...</p>
+            ) : result.length === 0 && !hasSearched ? (
+              <p className={styles.noResult}>検索してみよう！</p>
             ) : result.length === 0 ? (
               <p className={styles.noResult}>見つからなかった…</p>
             ) : (
@@ -264,7 +269,7 @@ export default function SearchPage() {
                         )}
                         {item.expectedQuantity !== undefined && (
                           <tr>
-                            <th>入る個数</th>
+                            <th>梱包数</th>
                             <td>{formatValue(item.expectedQuantity)}</td>
                           </tr>
                         )}
@@ -286,9 +291,10 @@ export default function SearchPage() {
                             <td>{formatValue(item.gapHeight)}mm</td>
                           </tr>
                         )}
+
                         {item.gapHeight !== undefined && item.gapLength !== undefined && item.gapWidth !== undefined && (
                           <tr>
-                            <th>挿入方向</th>
+                            <th>梱包方向</th>
                             <td>{Number(item.gapHeight) > Math.min(Number(item.gapLength), Number(item.gapWidth)) ? '縦入れ' : '横入れ'}</td>
                           </tr>
                         )}
